@@ -41,7 +41,7 @@ The output will be in the following format:
     MQTT_PASS=PASS
     ```
 
-3. Create the Python venv: `python -m venv venv`
+3. Create the Python venv: `python -m venv venv` (`deactivate` to end the venv)
 
 > Note: Substitute `python` for `python3` depending on your setup.
 
