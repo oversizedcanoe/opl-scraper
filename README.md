@@ -31,7 +31,7 @@ The output will be in the following format:
 # How To
 
 1. Clone the repo and `cd` into it.
-2. Create an `.env` file with your OPL credentials, using `sample.env` as a template.
+2. Create a `.env` file with your OPL credentials, using `EXAMPLE.env` as a template.
 
     ```text
     OPL_BARCODE=00000000000000
@@ -64,3 +64,46 @@ Options:
 >`sudo apt install -y chromium chromium-driver`
 
 ### To deploy with systemd
+1. Create a service file, using `EXAMPLE-library-script.service` as a template.
+
+`sudo nano /etc/systemd/system/library-script.service`
+
+```
+[Unit]
+Description=Library Scraper
+Wants=library-script.service
+[Service]
+ExecStart=/REPO_PATH/venv/bin/python3 /REPO_PATH/main.py
+User=LINUX_USER
+[Install]
+WantedBy=library.target
+```
+
+2. Create a timer file, using `EXAMPLE-library-script.timer` as a template.
+
+`sudo nano /etc/systemd/system/library-script.timer`
+```
+[Unit]
+Description=Run library script every 30 mins 9am-8pm
+
+[Timer]
+Unit=library-script.service
+OnCalendar=*-*-* 09..20:00,30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+3. Start Timer
+`sudo systemctl daemon-reload`
+`sudo systemctl enable --now library-script.timer`
+
+4. View Status to confirm it is active/waiting
+
+`sudo systemctl status library-script.timer`
+
+5. If changes need to be made to files or systemd files, after changing:
+`sudo systemctl daemon-reload`
+`sudo systemctl restart library-script.timer`
+
