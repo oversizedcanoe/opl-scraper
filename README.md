@@ -3,7 +3,7 @@ Scrapes the Ottawa Public Library for books that are checked out, on hold, due, 
 Publishes the results with MQTT to a configurable server address.
 
 # Output
-The application publish JSON via MQTT to the URL/port configured in the .env file, with the following endpoints:
+The application publishes JSON via MQTT to the URL/port configured in the .env file, with the following endpoints:
  - `library/{NAME}/holds`
  - `library/{NAME}/ready`
  - `library/{NAME}/checked_out`
@@ -36,14 +36,14 @@ The output will be in the following format:
     ```text
     OPL_BARCODE=00000000000000
     OPL_PIN=0000
+    HOSTNAME=homeassistant.local
+    PORT=1883
     NAME=Bob
     MQTT_USER=USER
     MQTT_PASS=PASS
     ```
 
-3. Create the Python venv: `python -m venv venv` (`deactivate` to end the venv)
-
-> Note: Substitute `python` for `python3` depending on your setup.
+3. Create the Python venv: `python3 -m venv venv` (`deactivate` to end the venv)
 
 4. Start the venv
 Linux: `source venv/bin/activate`
@@ -52,7 +52,7 @@ Windows: `.\venv\Scripts\activate`
 5. Install dependencies: `pip install -r requirements.txt`
 
 ### To run locally for debugging
-1. Run the scraper: `python main.py`.
+1. Run the scraper: `python3 main.py`.
 
 Options:
 
