@@ -2,8 +2,6 @@
 Scrapes the Ottawa Public Library for books that are checked out, on hold, due, and on hold.
 Publishes the results with MQTT to a configurable server address.
 
-This application will run headless (no browser) on Linux and headed (browser pops up) on Windows. Modify the source code as needed for your requirements.
-
 # Output
 The application publish JSON via MQTT to the URL/port configured in the .env file, with the following endpoints:
  - `library/{NAME}/holds`
@@ -54,7 +52,12 @@ Windows: `.\venv\Scripts\activate`
 5. Install dependencies: `pip install -r requirements.txt`
 
 ### To run locally for debugging
-1. Run the scraper: `python main.py`
+1. Run the scraper: `python main.py`.
+
+Options:
+
+- `-v` or `--verbose` for verbose mode
+- `-h` or `--headed` for headed mode (browser popup)
 
 >Note: if running on Linux, you must install Chromium Driver with:
 >

@@ -10,18 +10,26 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
 def scrape_opl() -> list:
     BARCODE = os.getenv("OPL_BARCODE")
     PIN = os.getenv("OPL_PIN")
+    verbose = any(arg in sys.argv for arg in ('-v', '--verbose'))
+    headed = any(arg in sys.argv for arg in ('-h', '--headed'))
 
     options = webdriver.ChromeOptions()
+
+    if headed == False:
+        options.add_argument("--headless=new") 
+        if verbose:
+            print('Running headless mode (no browser popup)')
+    else:
+        if verbose:
+            print('Running headed mode (browser popup)')
+
     if sys.platform == 'win32':
-        print('Running headed mode')
         driver = webdriver.Chrome(options=options)
     else:
-        # is linux, run headless and set executable location        
-        options.add_argument("--headless=new") 
+        # is linux, set executable location       
         options.add_argument("--no-sandbox") 
         service = Service(executable_path='/usr/bin/chromedriver')
         driver = webdriver.Chrome(service=service, options=options)

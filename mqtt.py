@@ -1,6 +1,7 @@
 import os
 import paho.mqtt.publish as publish
 import json
+import sys
 
 def publish_mqtt(endpoint, data):
     HOSTNAME = os.getenv("HOSTNAME")
@@ -18,5 +19,9 @@ def publish_mqtt(endpoint, data):
         auth={'username': MQTT_USER, 'password': MQTT_PASS}
     )
 
-    print('Published the following payload to: ' + HOSTNAME + ':' + str(PORT) + endpoint)
-    print(payload)
+    verbose = any(arg in sys.argv for arg in ('-v', '--verbose'))
+
+    if verbose:
+        path = f"mqtt://{MQTT_USER}:***@{HOSTNAME}:{PORT}/{endpoint}"
+        print('Published the following payload to ' + path)
+        print(payload)
