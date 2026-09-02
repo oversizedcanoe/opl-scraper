@@ -12,7 +12,7 @@ def publish_mqtt(endpoint, data):
         payload=payload,
         hostname=settings.hostname,
         port=settings.port,
-        auth={'username': settings.mqtt_user, 'password': settings.mqtt_user}
+        auth={'username': settings.mqtt_user, 'password': settings.mqtt_pass}
     )
 
     path = f"mqtt://{settings.mqtt_user}:***@{settings.hostname}:{settings.port}/{endpoint}"
