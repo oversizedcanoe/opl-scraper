@@ -3,7 +3,7 @@ Scrapes the Ottawa Public Library for books that are checked out, on hold, due, 
 Publishes the results with MQTT to a configurable server address.
 
 # Output
-The application publishes JSON via MQTT to the URL/port configured in the .env file, with the following endpoints:
+The application publishes JSON via MQTT to the URL/port configured in the config.json file, with the following endpoints:
  - `library/{NAME}/holds`
  - `library/{NAME}/ready`
  - `library/{NAME}/checked_out`
@@ -31,17 +31,29 @@ The output will be in the following format:
 # How To
 
 1. Clone the repo and `cd` into it.
-2. Create a `.env` file with your OPL credentials, using `EXAMPLE.env` as a template.
+2. Create a `config.json` file with your credentials and settings, using `sample.config.json` as a template.
 
-    ```text
-    OPL_BARCODE=00000000000000
-    OPL_PIN=0000
-    HOSTNAME=homeassistant.local
-    PORT=1883
-    NAME=Bob
-    MQTT_USER=USER
-    MQTT_PASS=PASS
-    ```
+    ```json
+    {
+    "hostname": "homeassistant.local",
+    "port": 1883,
+    "mqtt_user": "",
+    "mqtt_pass": "",
+    "headless": false,
+    "logging": true,
+    "users":[
+        {
+            "barcode":"11111111111111",
+            "pin":"1111",
+            "name": "user1"
+        },
+        {
+            "barcode":"22222222222222",
+            "pin":"2222",
+            "name": "user2"
+        }
+      ]
+    }
 
 3. Create the Python venv: `python3 -m venv venv` (`deactivate` to end the venv)
 
@@ -51,17 +63,12 @@ Windows: `.\venv\Scripts\activate`
 
 5. Install dependencies: `pip install -r requirements.txt`
 
-### To run locally for debugging
-1. Run the scraper: `python3 main.py`.
-
-Options:
-
-- `-v` or `--verbose` for verbose mode
-- `-h` or `--headed` for headed mode (browser popup)
-
 >Note: if running on Linux, you must install Chromium Driver with:
 >
 >`sudo apt install -y chromium chromium-driver`
+
+### To run locally for debugging
+1. Run the scraper: `python3 main.py`
 
 ### To deploy with systemd
 1. Create a service file, using `EXAMPLE-library-script.service` as a template.
@@ -95,8 +102,10 @@ Persistent=true
 WantedBy=timers.target
 ```
 
-3. Start Timer
+3. Start Timer:
+
 `sudo systemctl daemon-reload`
+
 `sudo systemctl enable --now library-script.timer`
 
 4. View Status to confirm it is active/waiting
@@ -104,6 +113,8 @@ WantedBy=timers.target
 `sudo systemctl status library-script.timer`
 
 5. If changes need to be made to files or systemd files, after changing:
+
 `sudo systemctl daemon-reload`
+
 `sudo systemctl restart library-script.timer`
 

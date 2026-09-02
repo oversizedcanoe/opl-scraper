@@ -1,34 +1,45 @@
 import datetime
-import os
-from dotenv import load_dotenv
-from scrape import scrape_opl
+from logger import logger
 from mqtt import publish_mqtt
+from scrape import Scraper
+from settings import settings
     
 if __name__ == "__main__":
-    load_dotenv()
+    logger.log("Script started")
 
-    NAME = os.getenv("NAME")
+    scraper = Scraper()
 
-    books = scrape_opl()
+    for user in settings.users:
+        name = user['name']    
+        barcode = user['barcode']    
+        pin = user['pin']    
 
-    update_time = datetime.datetime.now().isoformat()
-    
-    # Holds that aren't ready    
-    holds = [book for book in books if book.get("status", "").lower() in ["not ready", "in transit"]]
-    payload = {"count": len(holds), "items": holds, "last_updated": update_time }
-    publish_mqtt(f"library/{NAME}/holds", payload)
+        logger.log("Scraping for " + name)
 
-    # Ready for pick up
-    ready = [book for book in books if book.get("status", "").lower() == "ready"]
-    payload = { "count": len(ready), "items": ready, "last_updated": update_time }
-    publish_mqtt(f"library/{NAME}/ready", payload)
+        books = scraper.scrape_opl(barcode, pin)
 
-    # Checked out, not due
-    checked_out = [book for book in books if book.get("status", "").lower() == "due later"]
-    payload = { "count": len(checked_out), "items": checked_out, "last_updated": update_time }
-    publish_mqtt(f"library/{NAME}/checked_out", payload)
+        update_time = datetime.datetime.now().isoformat()
+        
+        # Holds that aren't ready    
+        holds = [book for book in books if book.get("status", "").lower() in ["not ready", "in transit"]]
+        payload = {"count": len(holds), "items": holds, "last_updated": update_time }
+        publish_mqtt(f"library/{name}/holds", payload)
 
-    # Checked out, due now
-    due = [book for book in books if book.get("status", "").lower() == "???"]
-    payload = { "count": len(due), "items": due, "last_updated": update_time }
-    publish_mqtt(f"library/{NAME}/due", payload)
+        # Ready for pick up
+        ready = [book for book in books if book.get("status", "").lower() == "ready"]
+        payload = { "count": len(ready), "items": ready, "last_updated": update_time }
+        publish_mqtt(f"library/{name}/ready", payload)
+
+        # Checked out, not due
+        checked_out = [book for book in books if book.get("status", "").lower() == "due later"]
+        payload = { "count": len(checked_out), "items": checked_out, "last_updated": update_time }
+        publish_mqtt(f"library/{name}/checked_out", payload)
+
+        # Checked out, due now
+        due = [book for book in books if book.get("status", "").lower() == "???"]
+        payload = { "count": len(due), "items": due, "last_updated": update_time }
+        publish_mqtt(f"library/{name}/due", payload)
+
+    logger.log("Done scraping")
+
+    scraper.dispose()
