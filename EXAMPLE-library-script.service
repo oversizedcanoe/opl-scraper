@@ -1,8 +1,8 @@
 [Unit]
 Description=Library Scraper
-Wants=library-script.service
 [Service]
 ExecStart=/REPO_PATH/venv/bin/python3 /REPO_PATH/main.py
 User=LINUX_USER
+WorkingDirectory=/REPO_PATH
 [Install]
-WantedBy=library.target
+WantedBy=multi-user.target
