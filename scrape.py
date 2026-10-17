@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 from settings import settings
 
 class Scraper:
@@ -49,9 +50,12 @@ class Scraper:
         wait.until(EC.url_contains("/holds"))
 
         # Parse books that are ready
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "cp-batch-actions-list-item")))
-
-        items = self.driver.find_elements(By.CLASS_NAME, "cp-batch-actions-list-item")
+        try:
+            wait.until(EC.presence_of_element_located((By.CLASS_NAME, "cp-batch-actions-list-item")))
+            items = self.driver.find_elements(By.CLASS_NAME, "cp-batch-actions-list-item")
+        except TimeoutException:
+            # None found
+            pass
 
         # Helper function to safely extract text without crashing if an element is missing
         def get_text(parent, find_by, css_selector):
@@ -81,9 +85,12 @@ class Scraper:
         self.driver.get("https://ottawa.bibliocommons.com/v2/checkedout")
         wait.until(EC.url_contains("/checkedout"))
 
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "cp-batch-actions-list-item")))
-
-        items = self.driver.find_elements(By.CLASS_NAME, "cp-batch-actions-list-item")
+        try:
+            wait.until(EC.presence_of_element_located((By.CLASS_NAME, "cp-batch-actions-list-item")))
+            items = self.driver.find_elements(By.CLASS_NAME, "cp-batch-actions-list-item")
+        except TimeoutException:
+            # None found
+            pass
 
         for item in items:
             books.append({
