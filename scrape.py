@@ -55,6 +55,7 @@ class Scraper:
             items = self.driver.find_elements(By.CLASS_NAME, "cp-batch-actions-list-item")
         except TimeoutException:
             # None found
+	    items = []
             pass
 
         # Helper function to safely extract text without crashing if an element is missing
@@ -90,6 +91,7 @@ class Scraper:
             items = self.driver.find_elements(By.CLASS_NAME, "cp-batch-actions-list-item")
         except TimeoutException:
             # None found
+	    items = []
             pass
 
         for item in items:
