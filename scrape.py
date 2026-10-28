@@ -14,7 +14,7 @@ class Scraper:
         options = webdriver.ChromeOptions()
 
         if settings.headless:
-            options.add_argument("--headless=new") 
+            options.add_argument("--headless=new")
             logger.log('Running headless mode (no browser popup)')
         else:
             logger.log('Running headed mode (browser popup)')
@@ -22,29 +22,29 @@ class Scraper:
         if sys.platform == 'win32':
             self.driver = webdriver.Chrome(options=options)
         else:
-            # is linux, set executable location       
-            options.add_argument("--no-sandbox") 
+            # is linux, set executable location
+            options.add_argument("--no-sandbox")
             service = Service(executable_path='/usr/bin/chromedriver')
             self.driver = webdriver.Chrome(service=service, options=options)
 
     def scrape_opl(self, barcode, pin) -> list:
         self.driver.get("https://forms.biblioottawalibrary.ca/en/oplusers/login")
-        
+
         # Wait for elements and populate
         wait = WebDriverWait(self.driver, 10)
-        
+
         user_input = wait.until(EC.presence_of_element_located((By.ID, "user_name")))
         pin_input = self.driver.find_element(By.ID, "user_pin")
         login_button = self.driver.find_element(By.ID, "edit-commit")
-        
+
         user_input.send_keys(barcode)
         pin_input.send_keys(pin)
-        
+
         login_button.click()
-        
+
         #  Wait for redirect to complete
         wait.until(EC.url_changes("https://forms.biblioottawalibrary.ca/en/oplusers/login"))
-        
+
         # Navigate to holds page
         self.driver.get("https://ottawa.bibliocommons.com/v2/holds")
         wait.until(EC.url_contains("/holds"))
@@ -55,7 +55,7 @@ class Scraper:
             items = self.driver.find_elements(By.CLASS_NAME, "cp-batch-actions-list-item")
         except TimeoutException:
             # None found
-	    items = []
+            items = []
             pass
 
         # Helper function to safely extract text without crashing if an element is missing
@@ -69,7 +69,7 @@ class Scraper:
         for item in items:
             queue_text = get_text(item, By.CLASS_NAME, 'cp-hold-position') or ''
             queue_match = re.search(r'#\s*(\d+)\s+on\s+(\d+)', queue_text.replace('\n', ' '))
-            
+
             books.append({
                 'title': get_text(item, By.CLASS_NAME, 'title-content'),
                 'author': get_text(item, By.CLASS_NAME, 'author-link'),
@@ -91,7 +91,7 @@ class Scraper:
             items = self.driver.find_elements(By.CLASS_NAME, "cp-batch-actions-list-item")
         except TimeoutException:
             # None found
-	    items = []
+            items = []
             pass
 
         for item in items:
@@ -104,7 +104,7 @@ class Scraper:
             })
 
         # Eventually implement "Saved for later" list too
-        
+
         # # Navigate to the for later page
         # self.driver.get("https://ottawa.bibliocommons.com/collection/show/my/library/for_later")
         # wait.until(EC.url_contains("/for_later"))
